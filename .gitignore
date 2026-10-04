@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Binaires compiles
+*.exe
+*.o
+*.obj
+*.out
+*.a
+*.lib
+
+# Artefacts de la demo Docker (regeneres a chaque execution)
+trame_saine.bin
+trame_corrompue.bin
+
+# Secrets / identifiants locaux
+secrets.h
+*.env
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini

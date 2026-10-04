@@ -246,10 +246,10 @@ docker-compose down
 [ATTAQUANT] Injection d'erreur réussie. Nouvelle donnée : 0xd3
 
 Message original : 0xD2
-Checksum calculé : 0xAD
+Checksum calculé : 0x30
 --- Transmission avec 1 erreur ---
 Message reçu     : 0xD3 (Erreur au bit 0)
-Nouveau checksum : 0xAC
+Nouveau checksum : 0x37
 RESULTAT : Erreur DETECTEE par le CRC !
 ```
 
@@ -389,7 +389,7 @@ gcc Correction_Err/Repetition.c -o verif_rep   && ./verif_rep
 
 - 🔑 **Identifiants Wi-Fi codés en dur** — `Esp32/Esp32.ino` contient un SSID et
   un mot de passe réels (`ssid = "HG"`, `password = "12345678"`).
-  **Changez-les et갹ez-les dans un fichier `secrets.h` ignoré par Git** si vous
+  **Changez-les et placez-les dans un fichier `secrets.h` ignoré par Git** si vous
   publiez ce dépôt publiquement.
 - 🔐 **Clé AES en clair** — la clé maîtresse `2B7E151628AED2A6ABF7158809CF4F3C`
   est présente dans `serveur_jeu.py` et dans le sketch ESP32. En production,
