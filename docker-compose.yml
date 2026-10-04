@@ -1,0 +1,35 @@
+
+networks:
+  crypto_net:
+    driver: bridge
+
+services:
+  emetteur:
+    image: python:3.10-slim
+    container_name: emetteur
+    volumes:
+      - .:/app
+    working_dir: /app
+    networks:
+      - crypto_net
+    command: tail -f /dev/null
+
+  attaquant:
+    image: python:3.10-slim
+    container_name: attaquant
+    volumes:
+      - .:/app
+    working_dir: /app
+    networks:
+      - crypto_net
+    command: tail -f /dev/null
+
+  recepteur:
+    image: gcc:latest
+    container_name: recepteur
+    volumes:
+      - .:/app
+    working_dir: /app
+    networks:
+      - crypto_net
+    command: tail -f /dev/null

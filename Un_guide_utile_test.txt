@@ -1,0 +1,104 @@
+================================================================================
+          GUIDE DE DÉPLOIEMENT ET D'EXÉCUTION — PROJET SÉCURITÉ
+================================================================================
+Étudiant : Gouider Mohamed
+Année universitaire : 2024 -- 2025
+Option : Systèmes Embarqués & IOT
+================================================================================
+
+Ce document récapitule l'intégralité des étapes nécessaires au lancement et à
+l'évaluation des deux démonstrations majeures du projet.
+
+
+--------------------------------------------------------------------------------
+1. CONFIGURATION ET ARCHITECTURE DES CONTENEURS DOCKER (DÉMO 1)
+--------------------------------------------------------------------------------
+L'architecture simule un scénario d'interception de type Man-in-the-Middle (MitM)
+sur un réseau isolé ('crypto_net') comprenant trois conteneurs distincts :
+
+  * emetteur  : Émet un octet intègre (0xD2) dans 'trame_saine.bin'.
+  * attaquant : Intercepte le fichier, applique une altération via un opérateur
+                logique XOR 0x01, et génère le fichier 'trame_corrompue.bin' (0xD3).
+  * recepteur : Analyse le fichier corrompu, compile le module en C et calcule la
+                division polynomiale CRC-8 (polynôme 0x07) pour isoler l'erreur.
+
+▶ PROCÉDURE D'EXÉCUTION AUTOMATISÉE (RECOMMANDÉE) :
+Ouvrez un terminal Windows (CMD) à la racine de votre dossier 'Securité' et tapez :
+   .\run_demo.bat
+
+Le script orchestre tout le cycle de vie : allumage des conteneurs, génération,
+corruption binaire par l'attaquant, compilation à la volée du code C, affichage 
+déterministe des résultats à l'écran, et nettoyage final des ressources Docker.
+
+▶ PROCÉDURE MANUELLE (ÉTAPES PAR ÉTAPES) :
+1. Allumer l'infrastructure :
+   docker-compose up -d
+
+2. Exécuter l'émetteur :
+   docker exec -it emetteur python -c "with open('trame_saine.bin', 'wb') as f: f.write(bytearray([0xD2]))"
+
+3. Exécuter l'attaquant :
+   docker exec -it attaquant python attaquant.py
+
+4. Compiler et lancer la vérification CRC-8 sur le récepteur :
+   docker exec -it recepteur sh -c "gcc Correction_Err/CRC.c -o verif_crc && ./verif_crc"
+
+5. Éteindre l'infrastructure :
+   docker-compose down
+
+
+--------------------------------------------------------------------------------
+2. PROTOCOLE DE DÉFI IOT : ÉCHANGE ESP32 <-> SERVEUR PYTHON (DÉMO 2)
+--------------------------------------------------------------------------------
+Cette démonstration valide l'interopérabilité et l'exactitude de l'algorithme 
+AES-128 (conforme FIPS-197) codé en Python ('aes.py') face à une carte embarquée.
+
+L'ESP32 transmet une chaîne chiffrée aléatoire en HTTP POST (JSON). Le serveur
+la déchiffre via la clé maîtresse '2B7E151628AED2A6ABF7158809CF4F3C' et lui renvoie
+la réponse en Hexadécimal. L'ESP32 compare le retour et valide le succès du défi.
+
+▶ ÉTAPE 1 : RÉCUPÉRATION DE L'ADRESSE IP DU PC
+Ouvrez votre terminal Windows et tapez :
+   ipconfig
+Notez votre adresse IPv4 locale (ex: 192.168.1.36).
+
+▶ ÉTAPE 2 : CONFIGURATION ET LANCEMENT DU SERVEUR PYTHON
+Démarrez le serveur d'écoute sur votre ordinateur :
+   python serveur_jeu.py
+Le terminal doit afficher : "=== SERVEUR DÉFI AES-128 LANCÉ SUR LE PORT 8080 ==="
+
+▶ ÉTAPE 3 : CONFIGURATION ET FLASH DE L'ESP32
+1. Ouvrez le code C++ de l'ESP32 dans l'Arduino IDE.
+2. Modifiez vos identifiants de connexion sans-fil :
+   const char* ssid = "HG";
+   const char* password = "12345678";
+3. Mettez à jour la variable 'serverUrl' avec l'IP de l'Étape 1 et le port 8080 :
+   const char* serverUrl = "http://192.168.1.36:8080/";
+4. Téléversez le programme sur votre carte ESP32.
+5. Ouvrez le Moniteur Série de l'Arduino IDE réglé sur 115200 bauds.
+
+▶ ÉTAPE 4 : VALIDATION VISUELLE
+* Le serveur Python va afficher en direct : 
+  "[SERVEUR] Défi Ciphertext reçu : 60A90FBE6C6F2B8D8F492E38DFE1097F"
+  "[SERVEUR] Bloc déchiffré avec votre code (HEX) : '0072008582483DF4F4E59486E6B51035'"
+
+* L'ESP32 intercepte la réponse brute et affiche l'indicateur de validation :
+  "[ESP32] RÉSULTAT : GAGNÉ ! Le serveur a déchiffré correctement avec votre code AES-128."
+
+
+--------------------------------------------------------------------------------
+3. ARBORESCENCE CONFORME DU CODE SOURCE
+--------------------------------------------------------------------------------
+Securité/
+├── AES_DES/               # Cœur des primitives de chiffrement symétrique
+│   ├── Version_c/         # Sources algorithmiques compilées en C
+│   └── Version_py/        # Fichiers 'aes.py', 'des.py' et 'main.py' de tests
+├── MD5/                   # Module de hachage et d'intégrité (RFC 1321)
+├── Correction_Err/        # Codes C de traitement d'erreurs (CRC.c, Hamming.c)
+├── attaquant.py           # Script d'injection d'anomalies réseau
+├── serveur_jeu.py         # Serveur API HTTP récepteur pour la carte IoT
+├── docker-compose.yml     # Script d'orchestration de l'infrastructure virtuelle
+├── run_demo.bat           # Script Windows d'automatisation en une seule commande
+└── README.md              # Documentation structurée du projet
+Le plus important toujours est l'emplacement des fichiers de manipulation(docker-compose.yml,serveur_jeu.py,...).
+================================================================================

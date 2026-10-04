@@ -1,0 +1,57 @@
+Structuration de rapport securite :
+1) Introduction : 
+Ce rapport est le fruit de tp dans le contexte de matiere securite des systèmes embarques . On illustre plusierurs les algorithmes de cryptage : AES (Advanced Encryption Standard) et l'algorithme DES (Data Encryption Standadrd ) ,  aussi des méthodes de detection d'erreru comme la methode de hamming le crc et la methode de repetition et finalement l'algorithme de hashage MD5 
+La structuration 
+section 1 : L'algorithme AES (sur 128 bits )
+	*** Overview sur l'lgorithme 
+        POUR ASSURER L'IMPLEMENTATION DE CET ALGORITHME ON SE REFERE TOUJOURS AUX DOCUMENTS DONNEES AU COURS DE SEANCES DE COURS 
+	*** l'implemenattion de l'algorithme 
+		decomposition de l'implemenattaion en sous blocs de fonctionnement 
+		Remarque: tous les tableaus et les data de reference ont ete ajoute d'une maniere constante au code . veuillez consulter le fichier aec.h pour plus de detailles . 
+	******** L'etape de multiplication comme indique la figure 1.1
+	******** L'expansion de cle est la fonction qui definie comment on a cree le cle necessaire pour le cryptage a chaque iteration et la logique utilise est celle illustre dans la figure 1.2 : 
+*********** Maintenant vers le reste de logique pour asurer le cryptage on a definie ces fonction biensure en se referant toujours sur le document de cours : 
+	**** add_round_key
+		sub_bytes
+shift_rows
+mix_columns
+Finalement et avant de passer vers l'implemnatation qui utilise tous les fonction qu'on a implemente , il faut implementer biensure les fonctions qui creent les blocs de 4 de donnee et retourne le message finale apres  : 
+bytes_to_state
+state_to_bytes
+et finalement la fonction finale qui illustre la methode de cryptage en suivant l'lgorithme AES : aes_decrypt 
+Et biensue on peut pas parler de cryptage de donnee sans definir la methode necessaire pour le decryptage et la figure.. illustre la logique de decryptage utilisee : aes_decrypt
+Maintenant le travaille sur l'lgorithme AES etait tres amusant mais on va reculer un peu vers le DES car il illustre aussi une logiqe amusante et voila . 
+section 2  : L'algorithme DES (sur 128 bits )
+
+L'agorithme DES : 
+overview : 
+ sur le fonctionnement de l'algorithe ... 
+
+*********** Implementation de DES : 
+Remarque : tous les donnees constante et les signatures des fonction utilises sont mentionne dans le fichier nomme des.h . Pour cette implemntation et comme indique dans le cours on se refere toujours a la standard : FIPS-46-3
+
+1*******
+Merci de prendre ces incformations en consideration : * Testé avec le vecteur classique :
+ *   Clé : 133457799BBCDFF1
+ *   PT  : 0123456789ABCDEF
+ *   CT  : 85E813540F0AB405 
+Commencons par la logique utilise par lea generation des cles elle est illustre par la figure suivantte ::des_generate_subkeys
+commencons pr l'etape de permutation faite illustre par le fisure 2.1 
+puis l'etape de declage a gauche : left_shift_28
+puis l'application de feistel : feistel_f 
+et finalement la logique generale vers le cryptage en suivant la,logique de des   : void des_process(const uint8_t input[8], const uint8_t key[8],
+UELQUES REMARQUES UTILISES  : 
+ on definit es fonctions static : bytes_to_bits et bits_to_bytes pour inimiser et garantir plus de visibilite de code et cette fois on a decide de jouer un peu avec le code e la fonction des_process est la meme utilisee pour le cryptage et le decryptage juste on va jouer sur  int idx = decrypt ? (15 - r) : r; cette logique qui sert de differncee entre le cryptage et le decryptage suivant la standard : FIPS-46-3 . et voili voilo  , on a utilise le cours et aussi on a effectue quelque recherches pour crucialiser le faite que c'est un cours construit en partenariat entre l'etudiant et l'enseignant et plus amusan a reviser apres . Finalement pour tester le fonctinnement de deux algorithmes on definit le fichier main.c qui illustre quelques testes et verifications de fonctionnemrnt : deux captures de execution de main.c de AES et DEs . Maintenant on a assure que notre donnee va circuler sur les canales d'une manière chiffre mais comment je garantie que les odnnee n'ont pas été change au cours de transmission et bein on parle de l'integrite d edonnee et cette caracteristique technique est garantie par le s algorithmes de hachages et comme un exemple on illustre l'implementation de l'algorithme MD5 
+section 3 : L'algorithme MD5 
+le reste il faut decomposer l'algorithe MD5 en sous blocs 
+Section 4 : les codes de correction d'erreur : 
+	4.1 CRC 
+	4.2 Hamming 
+	4.3Repetition
+Section 5 : Dockerisation de tout ca :) 
+ 	on va créer un reseau de conteneur de docker qu'on va les utilisers pour tester tous ces codes . 
+		
+
+ 
+
+	
